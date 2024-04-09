@@ -45,7 +45,6 @@ public class Mapper {
         response.setBorrowerId(user.getId());
         response.setBorrowerName(user.getUsername());
         response.setBookId(book.getId());
-        response.setBorrowedDate(book.getLocalDate());
         response.setAvailable(book.isAvailable());
         return response;
     }
@@ -56,7 +55,6 @@ public class Mapper {
         response.setBorrowerId(user.getId());
         response.setBorrowerName(user.getUsername());
         response.setBookId(book.getId());
-        response.setReturnedDate(book.getLocalDate());
         response.setAvailable(book.isAvailable());
         return response;
     }

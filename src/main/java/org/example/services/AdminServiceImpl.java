@@ -37,7 +37,6 @@ public class AdminServiceImpl implements AdminServices {
     @Override
     public void addTransaction(Transaction transaction, String username) {
         Book book = transaction.getBook();
-        transaction.setBorrowedDate(book.getLocalDate());
         validateAdmin(username.toLowerCase());
         validateLogin(username.toLowerCase());
         transactions.save(transaction);
