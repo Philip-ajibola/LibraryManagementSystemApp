@@ -28,8 +28,9 @@ public class AdminServiceImpl implements AdminServices {
     private BookServices bookServices;
     @Override
     public RegisterAdminResponse registerAdmin(RegisterAdminRequest registerAdminRequest) {
+        validateRequest(registerAdminRequest);
        if(adminRepository.count()==1)throw new AdminExistException("Admin Already Exist");
-        Librarian admin = adminRepository.save(map(registerAdminRequest));
+       Librarian admin = adminRepository.save(map(registerAdminRequest));
         return map(admin);
     }
 
@@ -82,6 +83,11 @@ public class AdminServiceImpl implements AdminServices {
         adminRepository.save(admin);
         return "Login successful";
     }
+    private static void validateRequest(RegisterAdminRequest registerAdminRequest) {
+        if(!registerAdminRequest.getUsername().matches("[a-zA-Z0-9]+"))throw new InvalidUserNameException("Username Can Only Contain Alphabet And Number and not null");
+        if(registerAdminRequest.getPassword().trim().isEmpty())throw new InvalidPasswordException("Provide A Valid Password");
+    }
+
 
     @Override
     public String logout(LogOutRequest logOutRequest) {
