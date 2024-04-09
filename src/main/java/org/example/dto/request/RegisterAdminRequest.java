@@ -1,9 +1,9 @@
-package org.example.dto;
+package org.example.dto.request;
 
 import lombok.Data;
 
 @Data
-public class LogOutRequest {
+public class RegisterAdminRequest {
     private String username;
     private String password;
 }

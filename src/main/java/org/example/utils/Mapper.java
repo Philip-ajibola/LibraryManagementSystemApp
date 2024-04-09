@@ -1,15 +1,12 @@
 package org.example.utils;
 
-import org.example.data.model.Admin;
+import org.example.data.model.Librarian;
 import org.example.data.model.Book;
 import org.example.data.model.User;
-import org.example.dto.AddBookRequest;
-import org.example.dto.RegisterAdminRequest;
-import org.example.dto.RegisterUserRequest;
-import org.example.dto.response.AddBookResponse;
-import org.example.dto.response.RegisterAdminResponse;
-import org.example.dto.response.BookResponse;
-import org.example.dto.response.RegisterUserResponse;
+import org.example.dto.request.AddBookRequest;
+import org.example.dto.request.RegisterAdminRequest;
+import org.example.dto.request.RegisterUserRequest;
+import org.example.dto.response.*;
 import org.example.exception.*;
 
 public class Mapper {
@@ -28,26 +25,38 @@ public class Mapper {
         addBookResponse.setBookId(book.getId());
         return addBookResponse;
     }
-    public static Admin map(RegisterAdminRequest registerAdminRequest) {
+    public static Librarian map(RegisterAdminRequest registerAdminRequest) {
         validateRequest(registerAdminRequest);
-        Admin admin = new Admin();
+        Librarian admin = new Librarian();
         admin.setPassword(registerAdminRequest.getPassword());
         admin.setUsername(registerAdminRequest.getUsername().toLowerCase());
         return admin;
     }
-    public static  RegisterAdminResponse map(Admin admin){
+    public static  RegisterAdminResponse map(Librarian admin){
         RegisterAdminResponse response = new RegisterAdminResponse();
         response.setId(admin.getId());
         response.setUsername(admin.getUsername());
         return response;
     }
-    public static BookResponse map(User user, Book book) {
-        BookResponse response = new BookResponse();
+    public static BorrowBookResponse map(User user, Book book) {
+        BorrowBookResponse response = new BorrowBookResponse();
         response.setBookTitle(book.getTitle());
         response.setBookIsbn(book.getIsbn());
         response.setBorrowerId(user.getId());
         response.setBorrowerName(user.getUsername());
         response.setBookId(book.getId());
+        response.setBorrowedDate(book.getLocalDate());
+        response.setAvailable(book.isAvailable());
+        return response;
+    }
+    public static ReturnBookResponse mapp(User user, Book book) {
+        ReturnBookResponse response = new ReturnBookResponse();
+        response.setBookTitle(book.getTitle());
+        response.setBookIsbn(book.getIsbn());
+        response.setBorrowerId(user.getId());
+        response.setBorrowerName(user.getUsername());
+        response.setBookId(book.getId());
+        response.setReturnedDate(book.getLocalDate());
         response.setAvailable(book.isAvailable());
         return response;
     }

@@ -2,8 +2,8 @@ package org.example.services;
 
 import org.example.data.repository.AdminRepository;
 import org.example.data.repository.Books;
-import org.example.dto.AddBookRequest;
-import org.example.dto.DeleteBookRequest;
+import org.example.dto.request.AddBookRequest;
+import org.example.dto.request.DeleteBookRequest;
 import org.example.exception.BookNotFoundException;
 import org.example.exception.InvalidAuthorNameException;
 import org.example.exception.InvalidBookTitleException;

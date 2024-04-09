@@ -3,7 +3,7 @@ package org.example.services;
 import org.example.data.repository.AdminRepository;
 import org.example.data.repository.Books;
 import org.example.data.repository.Users;
-import org.example.dto.*;
+import org.example.dto.request.*;
 import org.example.exception.BookNotFoundException;
 import org.example.exception.InvalidPasswordException;
 import org.example.exception.InvalidUserNameException;

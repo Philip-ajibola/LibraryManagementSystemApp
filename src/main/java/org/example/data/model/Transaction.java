@@ -13,5 +13,6 @@ public class Transaction {
     private Book book;
     private User user;
     private BookStatus bookStatus;
-    private LocalDate date;
+    private LocalDate borrowedDate;
+    private LocalDate returnDate;
 }

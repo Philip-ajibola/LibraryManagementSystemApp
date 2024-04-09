@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.dto.*;
+import org.example.dto.request.*;
 import org.example.dto.response.ApiResponse;
 import org.example.exception.LibraryManagementSystemException;
 import org.example.services.AdminServices;

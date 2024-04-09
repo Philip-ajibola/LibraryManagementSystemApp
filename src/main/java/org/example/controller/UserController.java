@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.dto.*;
+import org.example.dto.request.*;
 import org.example.dto.response.ApiResponse;
 import org.example.exception.LibraryManagementSystemException;
 import org.example.services.UserServices;
@@ -55,6 +55,15 @@ public class UserController {
     public ResponseEntity<?> requestBook(@RequestBody BorrowBookRequest bookRequest){
         try{
             var result = userServices.requestBook(bookRequest);
+            return new ResponseEntity<>(new ApiResponse(true,result), HttpStatus.CREATED);
+        }catch(LibraryManagementSystemException e){
+            return new ResponseEntity<>(new ApiResponse(false,e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @PostMapping("viewBooks/{username}")
+    public ResponseEntity<?> viewBooks(@PathVariable("username") String username){
+        try{
+            var result = userServices.viewAvailableBook(username);
             return new ResponseEntity<>(new ApiResponse(true,result), HttpStatus.CREATED);
         }catch(LibraryManagementSystemException e){
             return new ResponseEntity<>(new ApiResponse(false,e.getMessage()), HttpStatus.BAD_REQUEST);

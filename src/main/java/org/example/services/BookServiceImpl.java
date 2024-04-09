@@ -2,8 +2,8 @@ package org.example.services;
 
 import org.example.data.model.Book;
 import org.example.data.repository.Books;
-import org.example.dto.AddBookRequest;
-import org.example.dto.DeleteBookRequest;
+import org.example.dto.request.AddBookRequest;
+import org.example.dto.request.DeleteBookRequest;
 import org.example.dto.response.AddBookResponse;
 import org.example.exception.BookAlreadyExistException;
 import org.example.exception.BookNotFoundException;
