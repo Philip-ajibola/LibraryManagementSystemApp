@@ -9,6 +9,8 @@ import org.example.dto.request.RegisterUserRequest;
 import org.example.dto.response.*;
 import org.example.exception.*;
 
+import java.time.LocalDate;
+
 public class Mapper {
     public static Book map(AddBookRequest bookRequest) {
         validateBookRequest(bookRequest);
@@ -46,6 +48,7 @@ public class Mapper {
         response.setBorrowerName(user.getUsername());
         response.setBookId(book.getId());
         response.setAvailable(book.isAvailable());
+        response.setBorrowedDate(LocalDate.now());
         return response;
     }
     public static ReturnBookResponse mapp(User user, Book book) {
@@ -56,6 +59,7 @@ public class Mapper {
         response.setBorrowerName(user.getUsername());
         response.setBookId(book.getId());
         response.setAvailable(book.isAvailable());
+        response.setReturnedDate(LocalDate.now());
         return response;
     }
     public static User map(RegisterUserRequest registerUserRequest) {
