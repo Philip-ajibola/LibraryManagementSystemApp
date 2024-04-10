@@ -8,7 +8,7 @@ import org.example.dto.response.RegisterAdminResponse;
 
 import java.util.List;
 
-public interface AdminServices {
+public interface LibraryServices {
     RegisterAdminResponse registerAdmin(RegisterAdminRequest registerAdminRequest);
 
     void addTransaction(Transaction transaction,String username);
