@@ -1,6 +1,8 @@
 package org.example.services;
 
 import org.example.data.model.Book;
+import org.example.data.model.BookStatus;
+import org.example.data.model.Transaction;
 import org.example.data.model.User;
 import org.example.data.repository.Users;
 import org.example.dto.request.*;
@@ -38,16 +40,15 @@ public class UserServicesImpl implements  UserServices{
 
     @Override
     public String deleteUser(DeleteUserRequest deleteUserRequest) {
-    User user = users.findByUsername(deleteUserRequest.getUsername().toLowerCase());
-    validateUser(user);
+    User user = findByUsername(deleteUserRequest.getUsername().toLowerCase());
+    validateLogin(user);
     users.delete(user);
     return "User Deleted";
     }
 
     @Override
     public BorrowBookResponse requestBook(BorrowBookRequest borrowBookRequest) {
-        User user = users.findByUsername(borrowBookRequest.getUsername().toLowerCase());
-        validateUser(user);
+        User user = findByUsername(borrowBookRequest.getUsername().toLowerCase());
         validateLogin(user);
         return map(user,addBookToBorrowedBook(borrowBookRequest, user));
     }
@@ -56,65 +57,96 @@ public class UserServicesImpl implements  UserServices{
         Book book = bookServices.findBookByIsbn(borrowBookRequest.getIsbn());
         if(!book.isAvailable())throw new BookNotFoundException("Book Not Available At The Moment");
         book.setAvailable(false);
-        transactionServices.createTransaction(user,book);
-        transactionServices.addBorrowedDate(user,book,LocalDate.now());
         bookServices.save(book);
-        addBookToBorrowedList(user, book);
+        user.getBorrowBookList().add(book);
+        createBorrowBookTransaction(user,  book);
+        users.save(user);
         return book;
     }
 
-    private void addBookToBorrowedList(User user, Book book) {
-        List<Book> borrowedBookList = user.getBorrowBookList();
-        borrowedBookList.add(book);
-        user.setBorrowBookList(borrowedBookList);
-        users.save(user);
+    private void createBorrowBookTransaction(User user, Book book) {
+        Transaction transaction = new Transaction();
+        transaction.setReturnDate(LocalDate.now());
+        transaction.setUser(user);
+        transaction.setBookStatus(BookStatus.BORROWED);
+        transaction.setBook(book);
+        transactionServices.save(transaction);
     }
+
 
     @Override
     public List<Book> getBorrowedBook(String username){
-        User user = users.findByUsername(username.toLowerCase());
-        validateUser(user);
+        User user = findByUsername(username.toLowerCase());
+        validateLogin(user);
         if(user.getBorrowBookList().isEmpty())throw new BookNotFoundException("No Book Borrowed Yet");
         return user.getBorrowBookList();
     }
 
+    private User findByUsername(String username) {
+        User user = users.findByUsername(username);
+        if(user == null) throw new UserNotFoundException("User Not Found");
+        return user;
+    }
+
     @Override
     public List<Book> viewAvailableBook(String username) {
-        User user = users.findByUsername(username.toLowerCase());
-        validateUser(user);
+        User user = findByUsername(username.toLowerCase());
+        validateLogin(user);
         return bookServices.getAvailableBooks();
     }
 
     @Override
     public ReturnBookResponse returnBook(ReturnBookRequest returnBookRequest) {
-        User user = users.findByUsername(returnBookRequest.getUsername().toLowerCase());
-        validateUser(user);
+        User user = findByUsername(returnBookRequest.getUsername().toLowerCase());
         validateLogin(user);
         return mapp(user,removeBook(returnBookRequest, user));
     }
 
     private Book removeBook(ReturnBookRequest returnBookRequest, User user) {
         Book book = bookServices.findBookByIsbn(returnBookRequest.getIsbn());
-        if(book == null) throw new BookNotFoundException("Book not found");
-        removeBookFromBorrowedList(user, book);
-        transactionServices.createTransaction(user,book);
-        transactionServices.addReturnDate(user,book,LocalDate.now());
+        validateBorrowBook(user, book);
+        user.setBorrowBookList(remove(user.getBorrowBookList(), book));
+        users.save(user);
+        book.setAvailable(true);
         bookServices.save(book);
+        createReturnBookTransaction(user, book);
         return book;
     }
 
-    private void removeBookFromBorrowedList(User user, Book book) {
-        List<Book> borrowedBookList = user.getBorrowBookList();
-        borrowedBookList.remove(book);
-        book.setAvailable(true);
-        user.setBorrowBookList(borrowedBookList);
-        users.save(user);
+    private void createReturnBookTransaction(User user, Book book) {
+        Transaction transaction = new Transaction();
+        transaction.setReturnDate(LocalDate.now());
+        transaction.setUser(user);
+        transaction.setBookStatus(BookStatus.RETURNED);
+        transaction.setBook(book);
+        transactionServices.save(transaction);
     }
+
+    private  List<Book> remove(List<Book> books, Book book) {
+        for(Book book1: books){
+            if(book1.getIsbn().equals(book.getIsbn())){
+                books.remove(book1);
+                break;
+            }
+        }
+        return books;
+    }
+
+    private static void validateBorrowBook(User user, Book book) {
+        boolean condition = false;
+        for(Book book1 : user.getBorrowBookList()){
+            if(book1.getIsbn().equals(book.getIsbn())){
+                condition = true;
+                break;
+            }
+        }
+        if(!condition)throw new BookNotFoundException("Book Not Found In Borrowed Book List");
+    }
+
 
     @Override
     public String login(LogInRequest logInRequest) {
-        User user = users.findByUsername(logInRequest.getUsername().toLowerCase());
-        validateUser(user);
+        User user = findByUsername(logInRequest.getUsername().toLowerCase());
         validatePassword(logInRequest.getPassword(), user);
         user.setLoggedIn(true);
         users.save(user);
@@ -123,8 +155,8 @@ public class UserServicesImpl implements  UserServices{
 
     @Override
     public String logOut(LogOutRequest logOutRequest) {
-        User user = users.findByUsername(logOutRequest.getUsername().toLowerCase());
-        validateUser(user);
+        User user = findByUsername(logOutRequest.getUsername().toLowerCase());
+        if(!user.isLoggedIn())throw new LoginException("user Already logout");
         validatePassword(logOutRequest.getPassword(), user);
         user.setLoggedIn(false);
         users.save(user);
@@ -133,10 +165,6 @@ public class UserServicesImpl implements  UserServices{
 
     private  void validatePassword(String password, User user) {
         if(!password.equals(user.getPassword()))throw new InvalidPasswordException("Wrong password");
-    }
-
-    private void validateUser(User user) {
-        if(user == null)throw new UserNotFoundException("User Not Found");
     }
 
     private void validateLogin(User user){
