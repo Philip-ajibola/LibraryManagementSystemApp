@@ -1,6 +1,6 @@
 package org.example.services;
 
-import org.example.data.repository.AdminRepository;
+import org.example.data.repository.LibrarianRepository;
 import org.example.data.repository.Books;
 import org.example.dto.request.AddBookRequest;
 import org.example.dto.request.DeleteBookRequest;
@@ -19,13 +19,13 @@ public class BookServicesTest {
     @Autowired
     private BookServices bookServices;
     @Autowired
-    private AdminRepository adminRepository;
+    private LibrarianRepository librarianRepository;
     @Autowired
     private Books books;
     private AddBookRequest bookRequest;
     @BeforeEach
     public void initializer(){
-        adminRepository.deleteAll();
+        librarianRepository.deleteAll();
         books.deleteAll();
          bookRequest = new AddBookRequest();
         bookRequest.setAuthor("author");
