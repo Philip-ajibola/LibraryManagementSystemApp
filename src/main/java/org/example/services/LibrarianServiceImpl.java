@@ -3,7 +3,7 @@ package org.example.services;
 import org.example.data.model.Librarian;
 import org.example.data.model.Book;
 import org.example.data.model.Transaction;
-import org.example.data.repository.AdminRepository;
+import org.example.data.repository.LibrarianRepository;
 import org.example.data.repository.Transactions;
 import org.example.dto.request.*;
 import org.example.dto.response.AddBookResponse;
@@ -19,19 +19,19 @@ import java.util.List;
 import static org.example.utils.Mapper.map;
 
 @Service
-public class AdminServiceImpl implements AdminServices {
+public class LibrarianServiceImpl implements LibraryServices {
     @Autowired
     private Transactions transactions;
     @Autowired
-    private AdminRepository adminRepository;
+    private LibrarianRepository librarianRepository;
     @Autowired
     private BookServices bookServices;
     @Override
     public RegisterAdminResponse registerAdmin(RegisterAdminRequest registerAdminRequest) {
         validateRequest(registerAdminRequest);
-       if(adminRepository.count()==1)throw new AdminExistException("Admin Already Exist");
-       Librarian admin = adminRepository.save(map(registerAdminRequest));
-        return map(admin);
+       if(librarianRepository.count()==1)throw new LibrarianExistException("Admin Already Exist");
+       Librarian librarian = librarianRepository.save(map(registerAdminRequest));
+        return map(librarian);
     }
 
 
@@ -45,16 +45,16 @@ public class AdminServiceImpl implements AdminServices {
 
     private void validateAdmin(String username) {
         if(username.isEmpty())throw new InvalidUserNameException("Provide A valid UserName");
-        Librarian admin = adminRepository.findByUsername(username.toLowerCase());
+        Librarian admin = librarianRepository.findByUsername(username.toLowerCase());
         if(admin.getUsername() == null)throw new UserNotFoundException("Admin Not Found");
     }
 
     @Override
     public RegisterAdminResponse resetAdmin(ResetAdminRequest resetAdminRequest) {
-        Librarian admin = adminRepository.findByUsername(resetAdminRequest.getOldUsername().toLowerCase());
+        Librarian admin = librarianRepository.findByUsername(resetAdminRequest.getOldUsername().toLowerCase());
         admin.setUsername(resetAdminRequest.getUsername().toLowerCase());
         admin.setPassword(resetAdminRequest.getPassword());
-        adminRepository.save(admin);
+        librarianRepository.save(admin);
         return map(admin);
     }
 
@@ -71,16 +71,17 @@ public class AdminServiceImpl implements AdminServices {
         validateLogin(deleteBookRequest.getAdminName().toLowerCase());
         Book book = bookServices.findBookByIsbn(deleteBookRequest.getIsbn());
         if(book == null)throw new BookNotFoundException("Book not Found");
+        if(!book.isAvailable())throw new BookNotAvailableException("Book Has Been Borrowed And Can't Be Deleted");
         return bookServices.deleteBook(deleteBookRequest);
     }
 
     @Override
     public String login(LogInRequest logInRequest) {
         validateAdmin(logInRequest.getUsername().toLowerCase());
-        Librarian admin = adminRepository.findByUsername(logInRequest.getUsername().toLowerCase());
+        Librarian admin = librarianRepository.findByUsername(logInRequest.getUsername().toLowerCase());
         if(!logInRequest.getPassword().equals(admin.getPassword()))throw new InvalidPasswordException("Wrong password");
         admin.setLoggedIn(true);
-        adminRepository.save(admin);
+        librarianRepository.save(admin);
         return "Login successful";
     }
     private static void validateRequest(RegisterAdminRequest registerAdminRequest) {
@@ -91,13 +92,13 @@ public class AdminServiceImpl implements AdminServices {
 
     @Override
     public String logout(LogOutRequest logOutRequest) {
-        Librarian admin = adminRepository.findByUsername(logOutRequest.getUsername().toLowerCase());
+        Librarian admin = librarianRepository.findByUsername(logOutRequest.getUsername().toLowerCase());
         admin.setLoggedIn(false);
-        adminRepository.save(admin);
+        librarianRepository.save(admin);
         return "logout SuccessFul";
     }
     private void validateLogin(String username){
-        Librarian admin = adminRepository.findByUsername(username.toLowerCase());
+        Librarian admin = librarianRepository.findByUsername(username.toLowerCase());
         validateAdmin(username);
         if(!admin.isLoggedIn())throw new LoginException("Admin is not loggedIn");
     }
