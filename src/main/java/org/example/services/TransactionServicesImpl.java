@@ -15,27 +15,31 @@ public class TransactionServicesImpl implements TransactionServices{
     @Autowired
     private Transactions transactions;
     @Override
-    public void createTransaction(User user, Book book) {
+    public void createBorrowBookTransaction(User user, Book book,LocalDate localDate) {
         Transaction transaction = new Transaction();
         transaction.setId(user.getId());
         transaction.setUser(user);
         transaction.setBook(book);
-        if(book.isAvailable()) transaction.setBookStatus(BookStatus.RETURNED);
-        transactions.save(transaction);
-    }
-
-    @Override
-    public void addBorrowedDate(User user, Book book, LocalDate localDate) {
-        Transaction transaction = transactions.findByUserAndBook(user,book);
         transaction.setBorrowedDate(localDate);
+        transaction.setBookStatus(BookStatus.BORROWED);
         transactions.save(transaction);
     }
 
     @Override
-    public void addReturnDate(User user, Book book, LocalDate localDate) {
-        Transaction transaction = transactions.findByUserAndBook(user,book);
-        transaction.setReturnDate(localDate);
+    public void createReturnBookTransaction(User user, Book book, LocalDate localDate) {
+        Transaction transaction = new Transaction();
+        transaction.setId(user.getId());
+        transaction.setUser(user);
+        transaction.setBook(book);
+        transaction.setBorrowedDate(localDate);
+        transaction.setBookStatus(BookStatus.RETURNED);
         transactions.save(transaction);
     }
+
+    @Override
+    public void save(Transaction transaction) {
+        transactions.save(transaction);
+    }
+
 
 }
