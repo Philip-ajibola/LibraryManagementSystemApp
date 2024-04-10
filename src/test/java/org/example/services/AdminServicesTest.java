@@ -4,7 +4,7 @@ import org.example.data.model.Book;
 import org.example.data.model.BookStatus;
 import org.example.data.model.Transaction;
 import org.example.data.model.User;
-import org.example.data.repository.AdminRepository;
+import org.example.data.repository.LibrarianRepository;
 import org.example.data.repository.Books;
 import org.example.data.repository.Transactions;
 import org.example.dto.request.*;
@@ -19,11 +19,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 public class AdminServicesTest {
     @Autowired
-    private AdminServices adminServices;
+    private LibraryServices libraryServices;
     @Autowired
     private Books books;
     @Autowired
-    private AdminRepository adminRepository;
+    private LibrarianRepository librarianRepository;
 
     @Autowired
     private Transactions transactions;
@@ -32,48 +32,48 @@ public class AdminServicesTest {
     @BeforeEach
     public void initializer(){
         transactions.deleteAll();
-        adminRepository.deleteAll();
+        librarianRepository.deleteAll();
         books.deleteAll();
         logInRequest = new LogInRequest();
         registerAdminRequest = new RegisterAdminRequest();
         registerAdminRequest.setPassword("password");
         registerAdminRequest.setUsername("username");
-        adminServices.registerAdmin(registerAdminRequest);
+        libraryServices.registerAdmin(registerAdminRequest);
         logInRequest.setPassword(registerAdminRequest.getPassword());
         logInRequest.setUsername(registerAdminRequest.getUsername());
-        adminServices.login(logInRequest);
+        libraryServices.login(logInRequest);
     }
     @Test
     public void testThatAdminCanBeCreated(){
-         assertNotNull(adminRepository.findByUsername(registerAdminRequest.getUsername()));
+         assertNotNull(librarianRepository.findByUsername(registerAdminRequest.getUsername()));
     }
     @Test
     public void testThatAdminCanLogin(){
-        adminServices.login(logInRequest);
-        assertTrue(adminRepository.findByUsername(registerAdminRequest.getUsername()).isLoggedIn());
+        libraryServices.login(logInRequest);
+        assertTrue(librarianRepository.findByUsername(registerAdminRequest.getUsername()).isLoggedIn());
     }
     @Test
     public void testThatAdminCanLogOut(){
         LogOutRequest logOutRequest = new LogOutRequest();
         logOutRequest.setPassword(registerAdminRequest.getPassword());
         logOutRequest.setUsername(registerAdminRequest.getUsername());
-        adminServices.logout(logOutRequest);
-        assertFalse(adminRepository.findByUsername(registerAdminRequest.getUsername()).isLoggedIn());
+        libraryServices.logout(logOutRequest);
+        assertFalse(librarianRepository.findByUsername(registerAdminRequest.getUsername()).isLoggedIn());
     }
     @Test
     public void testThatWhenUserNameIsInValidExceptionIsThrown(){
         registerAdminRequest.setUsername("");
-        assertThrows(InvalidUserNameException.class,()->adminServices.registerAdmin(registerAdminRequest));
+        assertThrows(InvalidUserNameException.class,()-> libraryServices.registerAdmin(registerAdminRequest));
     }
     @Test
     public void testThatWhenPasswordIsInValidExceptionIsThrown(){
         registerAdminRequest.setPassword("");
-        assertThrows(InvalidPasswordException.class,()->adminServices.registerAdmin(registerAdminRequest));
+        assertThrows(InvalidPasswordException.class,()-> libraryServices.registerAdmin(registerAdminRequest));
     }
     @Test
     public void testThatAdminCanAddTransaction(){
         Transaction transaction = new Transaction();
-        adminServices.addTransaction(transaction,registerAdminRequest.getUsername());
+        libraryServices.addTransaction(transaction,registerAdminRequest.getUsername());
         assertEquals(1,transactions.count());
     }
     @Test
@@ -82,8 +82,8 @@ public class AdminServicesTest {
         resetAdminRequest.setUsername("newUsername");
         resetAdminRequest.setPassword("password");
         resetAdminRequest.setOldUsername(registerAdminRequest.getUsername());
-        adminServices.resetAdmin(resetAdminRequest);
-        assertEquals(1,adminRepository.count());
+        libraryServices.resetAdmin(resetAdminRequest);
+        assertEquals(1, librarianRepository.count());
     }
     @Test
     public void testThatAdminCanAddBookToBookShelf(){
@@ -92,7 +92,7 @@ public class AdminServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setIsbn("1234568794");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
-        adminServices.addBook(bookRequest);
+        libraryServices.addBook(bookRequest);
         assertEquals(1,books.count());
     }
     @Test
@@ -102,11 +102,11 @@ public class AdminServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setIsbn("1234568794");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
-        adminServices.addBook(bookRequest);
+        libraryServices.addBook(bookRequest);
         DeleteBookRequest deleteBookRequest = new DeleteBookRequest();
         deleteBookRequest.setIsbn(bookRequest.getIsbn());
         deleteBookRequest.setAdminName(registerAdminRequest.getUsername());
-        adminServices.deleteBook(deleteBookRequest);
+        libraryServices.deleteBook(deleteBookRequest);
         assertEquals(0,books.count());
     }
     @Test
@@ -118,7 +118,7 @@ public class AdminServicesTest {
         transaction.setBook(book);
         transaction.setUser(user);
         transactions.save(transaction);
-        assertEquals(1,adminServices.getTransactionHistory(registerAdminRequest.getUsername()).size());
+        assertEquals(1, libraryServices.getTransactionHistory(registerAdminRequest.getUsername()).size());
     }
     @Test
     public void testThatAdminCanBeChange(){
@@ -126,8 +126,8 @@ public class AdminServicesTest {
         resetAdminRequest.setPassword("newPassword");
         resetAdminRequest.setUsername("newAdmin");
         resetAdminRequest.setOldUsername(registerAdminRequest.getUsername());
-        adminServices.resetAdmin(resetAdminRequest);
-        assertEquals(1,adminRepository.count());
+        libraryServices.resetAdmin(resetAdminRequest);
+        assertEquals(1, librarianRepository.count());
     }
     @Test
     public void testThatAdminCanGetListOfAvailableBook(){
@@ -136,8 +136,8 @@ public class AdminServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setIsbn("1234568794");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
-        adminServices.addBook(bookRequest);
-       assertEquals(1, adminServices.getAvailablebooks(registerAdminRequest.getUsername()).size());
+        libraryServices.addBook(bookRequest);
+       assertEquals(1, libraryServices.getAvailablebooks(registerAdminRequest.getUsername()).size());
 
     }
     @Test
@@ -147,11 +147,11 @@ public class AdminServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setIsbn("1234568794");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
-        adminServices.addBook(bookRequest);
+        libraryServices.addBook(bookRequest);
         Book book = books.findByIsbn("1234568794");
         book.setAvailable(false);
         books.save(book);
-        assertEquals(1,adminServices.getBorrowedBook(registerAdminRequest.getUsername()).size());
+        assertEquals(1, libraryServices.getBorrowedBook(registerAdminRequest.getUsername()).size());
         assertEquals(1,books.count());
     }
 
