@@ -1,6 +1,6 @@
 package org.example.services;
 
-import org.example.data.repository.AdminRepository;
+import org.example.data.repository.LibrarianRepository;
 import org.example.data.repository.Books;
 import org.example.data.repository.Users;
 import org.example.dto.request.*;
@@ -21,27 +21,27 @@ public class UserServicesTest {
     @Autowired
     private UserServices userServices;
     @Autowired
-    private AdminRepository adminRepository;
+    private LibrarianRepository librarianRepository;
     @Autowired
     private Books books;
     @Autowired
     private Users users;
     private RegisterAdminRequest registerAdminRequest;
     @Autowired
-    private AdminServices adminServices;
+    private LibraryServices libraryServices;
     @BeforeEach
     public void initializer(){
-        adminRepository.deleteAll();
+        librarianRepository.deleteAll();
         registerAdminRequest = new RegisterAdminRequest();
         registerAdminRequest.setUsername("username");
         registerAdminRequest.setPassword("password");
 
-        adminServices.registerAdmin(registerAdminRequest);
+        libraryServices.registerAdmin(registerAdminRequest);
 
         LogInRequest logInRequest = new LogInRequest();
         logInRequest.setPassword(registerAdminRequest.getPassword());
         logInRequest.setUsername(registerAdminRequest.getUsername());
-        adminServices.login(logInRequest);
+        libraryServices.login(logInRequest);
 
 
         registerUserRequest = new RegisterUserRequest();
@@ -121,6 +121,12 @@ public class UserServicesTest {
         LogOutRequest logOutRequest = new LogOutRequest();
         logOutRequest.setUsername(registerUserRequest.getUsername());
         logOutRequest.setPassword(registerUserRequest.getPassword());
+        
+        LogInRequest logInRequest1 = new LogInRequest();
+        logInRequest1.setPassword(registerUserRequest.getPassword());
+        logInRequest1.setUsername(registerUserRequest.getUsername());
+        userServices.login(logInRequest1);
+
         userServices.logOut(logOutRequest);
         assertFalse(users.findByUsername(registerUserRequest.getUsername()).isLoggedIn());
     }
@@ -139,7 +145,7 @@ public class UserServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setAuthor("author");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
-        adminServices.addBook(bookRequest);
+        libraryServices.addBook(bookRequest);
         BorrowBookRequest borrowBookRequest =new BorrowBookRequest();
         borrowBookRequest.setIsbn("1234567584902");
         borrowBookRequest.setUsername(registerUserRequest.getUsername());
@@ -159,7 +165,7 @@ public class UserServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setAuthor("author");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
-        adminServices.addBook(bookRequest);
+        libraryServices.addBook(bookRequest);
         BorrowBookRequest borrowBookRequest =new BorrowBookRequest();
         borrowBookRequest.setIsbn("1234567984902");
         borrowBookRequest.setUsername(registerUserRequest.getUsername());
@@ -178,7 +184,7 @@ public class UserServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setAuthor("author");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
-        adminServices.addBook(bookRequest);
+        libraryServices.addBook(bookRequest);
         BorrowBookRequest borrowBookRequest =new BorrowBookRequest();
         borrowBookRequest.setIsbn("1234567584902");
         borrowBookRequest.setUsername(registerUserRequest.getUsername());
@@ -202,7 +208,7 @@ public class UserServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setAuthor("author");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
-        adminServices.addBook(bookRequest);
+        libraryServices.addBook(bookRequest);
         BorrowBookRequest borrowBookRequest =new BorrowBookRequest();
         borrowBookRequest.setIsbn("1234567584902");
         borrowBookRequest.setUsername(registerUserRequest.getUsername());
