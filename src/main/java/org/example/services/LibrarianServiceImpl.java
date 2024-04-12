@@ -21,7 +21,7 @@ import static org.example.utils.Mapper.map;
 @Service
 public class LibrarianServiceImpl implements LibraryServices {
     @Autowired
-    private Transactions transactions;
+    private TransactionServices transactions;
     @Autowired
     private LibrarianRepository librarianRepository;
     @Autowired
