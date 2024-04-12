@@ -66,7 +66,7 @@ public class UserServicesImpl implements  UserServices{
 
     private void createBorrowBookTransaction(User user, Book book) {
         Transaction transaction = new Transaction();
-        transaction.setReturnDate(LocalDate.now());
+        transaction.setBorrowedDate(LocalDate.now());
         transaction.setUser(user);
         transaction.setBookStatus(BookStatus.BORROWED);
         transaction.setBook(book);
