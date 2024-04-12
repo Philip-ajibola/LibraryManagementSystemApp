@@ -9,36 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class TransactionServicesImpl implements TransactionServices{
     @Autowired
     private Transactions transactions;
-    @Override
-    public void createBorrowBookTransaction(User user, Book book,LocalDate localDate) {
-        Transaction transaction = new Transaction();
-        transaction.setId(user.getId());
-        transaction.setUser(user);
-        transaction.setBook(book);
-        transaction.setBorrowedDate(localDate);
-        transaction.setBookStatus(BookStatus.BORROWED);
-        transactions.save(transaction);
-    }
-
-    @Override
-    public void createReturnBookTransaction(User user, Book book, LocalDate localDate) {
-        Transaction transaction = new Transaction();
-        transaction.setId(user.getId());
-        transaction.setUser(user);
-        transaction.setBook(book);
-        transaction.setBorrowedDate(localDate);
-        transaction.setBookStatus(BookStatus.RETURNED);
-        transactions.save(transaction);
-    }
 
     @Override
     public void save(Transaction transaction) {
         transactions.save(transaction);
+    }
+
+    @Override
+    public List<Transaction> findAll() {
+        return transactions.findAll();
     }
 
 
