@@ -4,7 +4,6 @@ import org.example.data.model.Librarian;
 import org.example.data.model.Book;
 import org.example.data.model.Transaction;
 import org.example.data.repository.LibrarianRepository;
-import org.example.data.repository.Transactions;
 import org.example.dto.request.*;
 import org.example.dto.response.AddBookResponse;
 import org.example.dto.response.RegisterAdminResponse;
@@ -46,13 +45,14 @@ public class LibrarianServiceImpl implements LibraryServices {
     private void validateAdmin(String username) {
         if(username.isEmpty())throw new InvalidUserNameException("Provide A valid UserName");
         Librarian admin = librarianRepository.findByUsername(username.toLowerCase());
-        if(admin.getUsername() == null)throw new UserNotFoundException("Admin Not Found");
+        if(admin == null)throw new UserNotFoundException("Admin Not Found");
     }
 
     @Override
     public RegisterAdminResponse resetAdmin(ResetAdminRequest resetAdminRequest) {
         Librarian admin = librarianRepository.findByUsername(resetAdminRequest.getOldUsername().toLowerCase());
-        admin.setUsername(resetAdminRequest.getUsername().toLowerCase());
+        if(admin == null) throw new LibraryManagementSystemException("Admin Not Found");
+        admin.setUsername(resetAdminRequest.getNewUsername().toLowerCase());
         admin.setPassword(resetAdminRequest.getPassword());
         librarianRepository.save(admin);
         return map(admin);

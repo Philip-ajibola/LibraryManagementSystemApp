@@ -51,7 +51,7 @@ public class UserController {
             return new ResponseEntity<>(new ApiResponse(false,e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
-    @PostMapping("/request_book")
+    @GetMapping("/request_book")
     public ResponseEntity<?> requestBook(@RequestBody BorrowBookRequest bookRequest){
         try{
             var result = userServices.requestBook(bookRequest);
@@ -60,8 +60,8 @@ public class UserController {
             return new ResponseEntity<>(new ApiResponse(false,e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
-    @PostMapping("viewBooks/{username}")
-    public ResponseEntity<?> viewBooks(@PathVariable("username") String username){
+    @GetMapping("viewAvailableBooks/{username}")
+    public ResponseEntity<?> viewAvailableBooks(@PathVariable("username") String username){
         try{
             var result = userServices.viewAvailableBook(username);
             return new ResponseEntity<>(new ApiResponse(true,result), HttpStatus.CREATED);

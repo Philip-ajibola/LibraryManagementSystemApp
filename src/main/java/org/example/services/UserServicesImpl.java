@@ -13,7 +13,9 @@ import org.example.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 
 import static org.example.utils.Mapper.map;
@@ -53,8 +55,11 @@ public class UserServicesImpl implements  UserServices{
         return map(user,addBookToBorrowedBook(borrowBookRequest, user));
     }
 
+
     private  Book addBookToBorrowedBook(BorrowBookRequest borrowBookRequest, User user) {
         Book book = bookServices.findBookByIsbn(borrowBookRequest.getIsbn());
+        book.setMaximumDateToReturnBook(LocalDate.now().plusDays(7));
+        if(user.getBalance().compareTo(BigDecimal.valueOf(1000))>=0) throw new OverDueBalanceException("You Have A Due balance, You Can't Borrow Book Until You Pay Up Your Debt");
         if(!book.isAvailable())throw new BookNotFoundException("Book Not Available At The Moment");
         book.setAvailable(false);
         bookServices.save(book);
@@ -105,6 +110,12 @@ public class UserServicesImpl implements  UserServices{
     private Book removeBook(ReturnBookRequest returnBookRequest, User user) {
         Book book = bookServices.findBookByIsbn(returnBookRequest.getIsbn());
         validateBorrowBook(user, book);
+        if(Period.between(LocalDate.now(),book.getMaximumDateToReturnBook()).getDays()>0){
+            user.setBalance(BigDecimal.valueOf(500));
+            book.setMaximumDateToReturnBook(LocalDate.now().plusDays(7));
+        }else{
+            book.setMaximumDateToReturnBook(null);
+        }
         user.setBorrowBookList(remove(user.getBorrowBookList(), book));
         users.save(user);
         book.setAvailable(true);

@@ -15,4 +15,5 @@ public class Book {
     @Id
     private String id;
     private boolean isAvailable = true;
+    private LocalDate maximumDateToReturnBook;
 }

@@ -27,7 +27,7 @@ public class BookServiceImpl implements BookServices{
     }
 
     private void checkIfBookExist(AddBookRequest bookRequest) {
-        books.findAll().forEach(book -> {if(book.getIsbn().equals(bookRequest.getIsbn()))throw new BookAlreadyExistException("Book Already Exist");});
+        books.findAll().forEach(book -> {if(book.getIsbn().equals(bookRequest.getIsbn()))throw new BookAlreadyExistException("Book ISBN Number Already Exist");});
     }
 
 
