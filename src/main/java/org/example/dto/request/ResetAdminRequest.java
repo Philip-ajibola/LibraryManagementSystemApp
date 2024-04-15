@@ -6,7 +6,6 @@ import lombok.Data;
 public class ResetAdminRequest {
     private String oldUsername;
     private String newUsername;
-    private String password;
-
+    private String newPassword;
 }
 

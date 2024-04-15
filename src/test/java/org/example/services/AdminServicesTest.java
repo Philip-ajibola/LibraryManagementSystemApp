@@ -80,7 +80,7 @@ public class AdminServicesTest {
     public void testThatAdminAccountCanBeReset(){
         ResetAdminRequest resetAdminRequest = new ResetAdminRequest();
         resetAdminRequest.setNewUsername("newUsername");
-        resetAdminRequest.setPassword("password");
+        resetAdminRequest.setNewPassword("password");
         resetAdminRequest.setOldUsername(registerAdminRequest.getUsername());
         libraryServices.resetAdmin(resetAdminRequest);
         assertEquals(1, librarianRepository.count());
@@ -123,7 +123,7 @@ public class AdminServicesTest {
     @Test
     public void testThatAdminCanBeChange(){
         ResetAdminRequest resetAdminRequest = new ResetAdminRequest();
-        resetAdminRequest.setPassword("newPassword");
+        resetAdminRequest.setNewPassword("newPassword");
         resetAdminRequest.setNewUsername("newAdmin");
         resetAdminRequest.setOldUsername(registerAdminRequest.getUsername());
         libraryServices.resetAdmin(resetAdminRequest);

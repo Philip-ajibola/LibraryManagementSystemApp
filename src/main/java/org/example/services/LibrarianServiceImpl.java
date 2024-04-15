@@ -53,7 +53,7 @@ public class LibrarianServiceImpl implements LibraryServices {
         Librarian admin = librarianRepository.findByUsername(resetAdminRequest.getOldUsername().toLowerCase());
         if(admin == null) throw new LibraryManagementSystemException("Admin Not Found");
         admin.setUsername(resetAdminRequest.getNewUsername().toLowerCase());
-        admin.setPassword(resetAdminRequest.getPassword());
+        admin.setPassword(resetAdminRequest.getNewPassword());
         librarianRepository.save(admin);
         return map(admin);
     }
