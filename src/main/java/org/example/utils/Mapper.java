@@ -1,5 +1,6 @@
 package org.example.utils;
 
+import org.example.data.model.History;
 import org.example.data.model.Librarian;
 import org.example.data.model.Book;
 import org.example.data.model.User;
@@ -8,6 +9,7 @@ import org.example.dto.request.RegisterAdminRequest;
 import org.example.dto.request.RegisterUserRequest;
 import org.example.dto.response.*;
 import org.example.exception.*;
+import org.example.services.TransactionServices;
 
 import java.time.LocalDate;
 
@@ -39,6 +41,25 @@ public class Mapper {
         response.setId(admin.getId());
         response.setUsername(admin.getUsername());
         return response;
+    }
+    public static AvailableBookResponse mapAvailableBookResponse(Book book) {
+        AvailableBookResponse available = new AvailableBookResponse();
+
+        available.setId(book.getId());
+        available.setIsbn(book.getIsbn());
+        available.setTitle(book.getTitle());
+        available.setMaximumDateToReturnBook(book.getMaximumDateToReturnBook());
+        return available;
+    }
+    public static BorrowedBookResponse mapBorrowedBookResponse(Book book) {
+        BorrowedBookResponse available = new BorrowedBookResponse();
+
+        available.setId(book.getId());
+        available.setIsbn(book.getIsbn());
+        available.setTitle(book.getTitle());
+        available.setBorrowerName(book.getBorrowerName());
+        available.setMaximumDayToReturnBook(book.getMaximumDateToReturnBook());
+        return available;
     }
     public static BorrowBookResponse map(User user, Book book) {
         BorrowBookResponse response = new BorrowBookResponse();
