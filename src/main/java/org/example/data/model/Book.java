@@ -16,4 +16,6 @@ public class Book {
     private String id;
     private boolean isAvailable = true;
     private LocalDate maximumDateToReturnBook;
+    private String borrowerName;
+
 }
