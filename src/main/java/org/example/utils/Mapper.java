@@ -20,6 +20,7 @@ public class Mapper {
         book.setAuthorName(bookRequest.getAuthor());
         book.setTitle(bookRequest.getTitle());
         book.setIsbn(bookRequest.getIsbn());
+        book.setBookCategory(bookRequest.getCategory());
         return book;
     }
     public static AddBookResponse map(Book book){
@@ -44,11 +45,11 @@ public class Mapper {
     }
     public static AvailableBookResponse mapAvailableBookResponse(Book book) {
         AvailableBookResponse available = new AvailableBookResponse();
-
         available.setId(book.getId());
+        available.setAuthor(book.getAuthorName());
+        available.setCategory(book.getBookCategory());
         available.setIsbn(book.getIsbn());
         available.setTitle(book.getTitle());
-        available.setMaximumDateToReturnBook(book.getMaximumDateToReturnBook());
         return available;
     }
     public static BorrowedBookResponse mapBorrowedBookResponse(Book book) {
@@ -64,12 +65,11 @@ public class Mapper {
     public static BorrowBookResponse map(User user, Book book) {
         BorrowBookResponse response = new BorrowBookResponse();
         response.setBookTitle(book.getTitle());
-        response.setBookIsbn(book.getIsbn());
-        response.setBorrowerId(user.getId());
-        response.setBorrowerName(user.getUsername());
+        response.setIsbn(book.getIsbn());
         response.setBookId(book.getId());
-        response.setAvailable(book.isAvailable());
-        response.setBorrowedDate(LocalDate.now());
+        response.setCategory(book.getBookCategory());
+        response.setBookAuthor(book.getAuthorName());
+        response.setMaximumDateToReturnBook(book.getMaximumDateToReturnBook());
         return response;
     }
     public static ReturnBookResponse mapp(User user, Book book) {
@@ -101,6 +101,7 @@ public class Mapper {
         if(bookRequest.getTitle().isEmpty())throw new InvalidBookTitleException("Provide A Book Title");
         if(bookRequest.getIsbn().isEmpty()|| bookRequest.getIsbn().length()<10 ||  bookRequest.getIsbn().length()>13 )throw new InvalidISBNNumberException("Provide A valid Isbn number");
         if(bookRequest.getAuthor().isEmpty()||!bookRequest.getAuthor().matches("[a-zA-Z\\s]+"))throw new InvalidAuthorNameException("Provide A Valid AuthorName ");
+        if(bookRequest.getCategory() == null) throw new BookCategoryException("Book Category can't be null");
     }
     private static void validateRequest(RegisterAdminRequest registerAdminRequest) {
         if(!registerAdminRequest.getUsername().matches("[a-zA-Z0-9]+"))throw new InvalidUserNameException("Username Can Only Contain Alphabet And Number and not null");
