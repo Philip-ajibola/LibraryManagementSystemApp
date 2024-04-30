@@ -7,5 +7,6 @@ public class ResetAdminRequest {
     private String oldUsername;
     private String newUsername;
     private String newPassword;
+    private String oldPassword;
 }
 
