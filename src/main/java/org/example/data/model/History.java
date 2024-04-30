@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class History {
     @Id
     private String id;
-    private Book book;
+    private String bookId;
     private String borrowerName;
     private BookStatus bookStatus;
     private LocalDate borrowedDate;
