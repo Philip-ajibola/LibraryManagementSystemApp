@@ -17,5 +17,8 @@ public class Book {
     private boolean isAvailable = true;
     private LocalDate maximumDateToReturnBook;
     private String borrowerName;
+    private LocalDate BorrowDate;
+    private BookCategory bookCategory;
+
 
 }
