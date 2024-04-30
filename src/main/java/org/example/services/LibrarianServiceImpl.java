@@ -38,7 +38,7 @@ public class LibrarianServiceImpl implements LibraryServices {
 
     @Override
     public void addTransaction(History history, String username) {
-        Book book = history.getBook();
+        Book book = bookServices.findBookById(history.getBookId());
         validateAdmin(username.toLowerCase());
         validateLogin(username.toLowerCase());
         transactions.save(history);
@@ -54,6 +54,7 @@ public class LibrarianServiceImpl implements LibraryServices {
     public RegisterAdminResponse resetAdmin(ResetAdminRequest resetAdminRequest) {
         Librarian admin = librarianRepository.findByUsername(resetAdminRequest.getOldUsername().toLowerCase());
         if(admin == null) throw new LibraryManagementSystemException("Admin Not Found");
+        if(!resetAdminRequest.getOldPassword().equals(admin.getPassword()))throw new InvalidPasswordException("InValid Password");
         admin.setUsername(resetAdminRequest.getNewUsername().toLowerCase());
         admin.setPassword(resetAdminRequest.getNewPassword());
         librarianRepository.save(admin);
@@ -106,7 +107,7 @@ public class LibrarianServiceImpl implements LibraryServices {
     }
 
     @Override
-    public List<History> getTransactionHistory(String username) {
+    public List<History> getBooksHistory(String username) {
         validateAdmin(username.toLowerCase());
         if(transactions.findAll().isEmpty()) throw new NoTransactionException("No Transaction Made Yet");
         return transactions.findAll();
@@ -141,7 +142,7 @@ public class LibrarianServiceImpl implements LibraryServices {
         validateAdmin(getBookHistoryRequest.getLibrarianName());
         Book book = bookServices.findBookByIsbn(getBookHistoryRequest.getIsbn());
         List<History> bookHistory = new ArrayList<>();
-        getTransactionHistory(getBookHistoryRequest.getLibrarianName()).forEach(history ->{ if(history.getBook().getIsbn().equals(book.getIsbn())) bookHistory.add(history);});
+        getBooksHistory(getBookHistoryRequest.getLibrarianName()).forEach(history ->{ if(history.getBookId().equals(book.getId())) bookHistory.add(history);});
         if(bookHistory.isEmpty())throw new NoBookHistoryFoundException(String.format("No History Of %s Found " ,book.getTitle()));
         return bookHistory;
     }
