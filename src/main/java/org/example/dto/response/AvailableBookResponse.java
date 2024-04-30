@@ -12,5 +12,4 @@ public class AvailableBookResponse {
     private String isbn;
     private String Title;
     private BookCategory category;
-    private LocalDate maximumDateToReturnBook;
 }
