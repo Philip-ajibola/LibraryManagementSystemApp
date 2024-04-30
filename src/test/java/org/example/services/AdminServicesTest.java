@@ -2,7 +2,7 @@ package org.example.services;
 
 import org.example.data.model.Book;
 import org.example.data.model.BookStatus;
-import org.example.data.model.Transaction;
+import org.example.data.model.History;
 import org.example.data.model.User;
 import org.example.data.repository.LibrarianRepository;
 import org.example.data.repository.Books;
@@ -72,8 +72,8 @@ public class AdminServicesTest {
     }
     @Test
     public void testThatAdminCanAddTransaction(){
-        Transaction transaction = new Transaction();
-        libraryServices.addTransaction(transaction,registerAdminRequest.getUsername());
+        History history = new History();
+        libraryServices.addTransaction(history,registerAdminRequest.getUsername());
         assertEquals(1,transactions.count());
     }
     @Test
@@ -112,12 +112,12 @@ public class AdminServicesTest {
     @Test
     public void testThatAdminCanGetTransactionHistory(){
         User user  = new User();
-        Transaction transaction = new Transaction();
+        History history = new History();
         Book book = new Book();
-        transaction.setBookStatus(BookStatus.BORROWED);
-        transaction.setBook(book);
-        transaction.setUser(user);
-        transactions.save(transaction);
+        history.setBookStatus(BookStatus.BORROWED);
+        history.setBook(book);
+        history.setBorrowerName(user.getUsername());
+        transactions.save(history);
         assertEquals(1, libraryServices.getTransactionHistory(registerAdminRequest.getUsername()).size());
     }
     @Test
