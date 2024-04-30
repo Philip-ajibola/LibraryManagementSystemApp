@@ -1,16 +1,16 @@
 package org.example.dto.response;
 
 import lombok.Data;
+import org.example.data.model.BookCategory;
 
 import java.time.LocalDate;
 
 @Data
 public class BorrowBookResponse {
-    private String borrowerId;
-    private String borrowerName;
-    private String bookTitle;
-    private String bookIsbn;
     private String bookId;
-    private boolean isAvailable;
-    private LocalDate borrowedDate;
+    private String bookTitle;
+    private String bookAuthor;
+    private BookCategory Category;
+    private String isbn;
+    private LocalDate maximumDateToReturnBook;
 }
