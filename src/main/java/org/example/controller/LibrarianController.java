@@ -91,6 +91,16 @@ public class LibrarianController {
             return new ResponseEntity<>(new ApiResponse(false,e.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping("/get_book_history")
+    public ResponseEntity<?> getBookHistory(@RequestBody GetBookHistoryRequest getBookHistoryRequest ){
+        try{
+            var result = libraryServices.getHistoryOfBook(getBookHistoryRequest);
+            return new ResponseEntity<>(new ApiResponse(true,result), HttpStatus.CREATED);
+        }catch (LibraryManagementSystemException e){
+            return new ResponseEntity<>(new ApiResponse(false,e.getMessage()),HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
 
 
