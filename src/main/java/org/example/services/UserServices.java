@@ -23,4 +23,6 @@ public interface UserServices {
     String logOut(LogOutRequest logOutRequest);
     List<Book> getBorrowedBook(String username);
     List<AvailableBookResponse> viewAvailableBook(String username);
+    List<Book> findBookByCategory(FindByBookCategoryRequest request);
+    List<Book> findBookByAuthor(FindBookByAuthorReQuest request);
 }
