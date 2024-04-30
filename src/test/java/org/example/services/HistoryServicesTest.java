@@ -1,7 +1,7 @@
 package org.example.services;
 
 import org.example.data.model.Book;
-import org.example.data.model.Transaction;
+import org.example.data.model.History;
 import org.example.data.model.BookStatus;
 import org.example.data.model.User;
 import org.example.data.repository.Transactions;
@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
-public class TransactionServicesTest {
+public class HistoryServicesTest {
     @Autowired
     private Transactions transactions;
 
@@ -24,11 +24,11 @@ public class TransactionServicesTest {
         book.setIsbn("1234567895");
         book.setTitle("title");
         book.setAuthorName("author");
-        Transaction transaction = new Transaction();
-        transaction.setBookStatus(BookStatus.RETURNED);
-        transaction.setBook(book);
-        transaction.setUser(user);
-        transactions.save(transaction);
+        History history = new History();
+        history.setBookStatus(BookStatus.RETURNED);
+        history.setBook(book);
+        history.setBorrowerName(user.getUsername());
+        transactions.save(history);
         assertEquals(1,transactions.count());
     }
 
