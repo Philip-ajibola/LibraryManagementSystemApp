@@ -1,6 +1,5 @@
 package org.example.services;
 
-import org.example.data.model.Book;
 import org.example.data.model.History;
 import org.example.dto.request.*;
 import org.example.dto.response.AddBookResponse;
@@ -25,7 +24,7 @@ public interface LibraryServices {
 
     String logout(LogOutRequest logOutRequest);
 
-    List<History> getTransactionHistory(String username);
+    List<History> getBooksHistory(String username);
     List<AvailableBookResponse> getAvailablebooks(String username);
 
     List<BorrowedBookResponse> getBorrowedBook(String username);
