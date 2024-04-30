@@ -118,7 +118,7 @@ public class AdminServicesTest {
         history.setBook(book);
         history.setBorrowerName(user.getUsername());
         transactions.save(history);
-        assertEquals(1, libraryServices.getTransactionHistory(registerAdminRequest.getUsername()).size());
+        assertEquals(1, libraryServices.getBooksHistory(registerAdminRequest.getUsername()).size());
     }
     @Test
     public void testThatAdminCanBeChange(){
