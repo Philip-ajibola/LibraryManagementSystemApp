@@ -1,6 +1,7 @@
 package org.example.services;
 
 import org.example.data.model.Book;
+import org.example.data.model.BookCategory;
 import org.example.data.repository.Books;
 import org.example.dto.request.AddBookRequest;
 import org.example.dto.request.DeleteBookRequest;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.example.utils.Mapper.map;
 
@@ -51,12 +53,29 @@ public class BookServiceImpl implements BookServices{
     }
 
     @Override
+    public List<Book> findBookByCategory(BookCategory category) {
+        List<Book > bookList =books.findByBookCategory(category);
+        if(bookList.isEmpty())throw new BookNotFoundException("No Books Found For " + category + "Category");
+        return bookList;
+
+    }
+
+
+    @Override
     public List<Book> getAvailableBooks() {
         List<Book> availableBook = new ArrayList<>();
         books.findAll().forEach(book -> {if(book.isAvailable()) availableBook.add(book);});
         if(availableBook.isEmpty())throw new BookNotFoundException("No Book Found Available");
         return availableBook;
     }
+
+    @Override
+    public List<Book> findBookByAuthor(String author) {
+        List<Book > bookList = books.findBookByAuthorName(author);
+        if(bookList.isEmpty())throw new BookNotFoundException("No Books Found For " + author);
+        return bookList;
+    }
+
     @Override
     public List<Book> getBorrowedBooks(){
         List<Book> borrowedBook = new ArrayList<>();
@@ -68,5 +87,12 @@ public class BookServiceImpl implements BookServices{
     @Override
     public List<Book> findAll() {
         return books.findAll();
+    }
+
+    @Override
+    public Book findBookById(String bookId) {
+        Optional<Book> book = books.findById(bookId);
+        if(book.isEmpty()) throw new BookNotFoundException("Book Not Available");
+        return book.get();
     }
 }
