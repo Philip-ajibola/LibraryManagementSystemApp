@@ -1,9 +1,11 @@
 package org.example.services;
 
 import org.example.data.model.Book;
-import org.example.data.model.Transaction;
+import org.example.data.model.History;
 import org.example.dto.request.*;
 import org.example.dto.response.AddBookResponse;
+import org.example.dto.response.AvailableBookResponse;
+import org.example.dto.response.BorrowedBookResponse;
 import org.example.dto.response.RegisterAdminResponse;
 
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
 public interface LibraryServices {
     RegisterAdminResponse registerAdmin(RegisterAdminRequest registerAdminRequest);
 
-    void addTransaction(Transaction transaction,String username);
+    void addTransaction(History history, String username);
     RegisterAdminResponse resetAdmin(ResetAdminRequest deleteAdminRequest);
 
 
@@ -23,10 +25,10 @@ public interface LibraryServices {
 
     String logout(LogOutRequest logOutRequest);
 
-    List<Transaction> getTransactionHistory(String username);
-    List<Book> getAvailablebooks(String username);
+    List<History> getTransactionHistory(String username);
+    List<AvailableBookResponse> getAvailablebooks(String username);
 
-    List<Book> getBorrowedBook(String username);
-
+    List<BorrowedBookResponse> getBorrowedBook(String username);
+    List<History> getHistoryOfBook(GetBookHistoryRequest getBookHistoryRequest);
 
 }
