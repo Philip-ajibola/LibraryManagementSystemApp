@@ -2,10 +2,11 @@ package org.example.services;
 
 import org.example.data.model.Book;
 import org.example.data.model.BookStatus;
-import org.example.data.model.Transaction;
+import org.example.data.model.History;
 import org.example.data.model.User;
 import org.example.data.repository.Users;
 import org.example.dto.request.*;
+import org.example.dto.response.AvailableBookResponse;
 import org.example.dto.response.BorrowBookResponse;
 import org.example.dto.response.RegisterUserResponse;
 import org.example.dto.response.ReturnBookResponse;
@@ -16,10 +17,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.example.utils.Mapper.map;
-import static org.example.utils.Mapper.mapp;
+import static org.example.utils.Mapper.*;
 
 @Service
 public class UserServicesImpl implements  UserServices{
@@ -59,23 +60,24 @@ public class UserServicesImpl implements  UserServices{
     private  Book addBookToBorrowedBook(BorrowBookRequest borrowBookRequest, User user) {
         Book book = bookServices.findBookByIsbn(borrowBookRequest.getIsbn());
         book.setMaximumDateToReturnBook(LocalDate.now().plusDays(7));
-        if(user.getBalance().compareTo(BigDecimal.valueOf(1000))>=0) throw new OverDueBalanceException("You Have A Due balance, You Can't Borrow Book Until You Pay Up Your Debt");
+        if(user.getBalance().compareTo(BigDecimal.valueOf(500))>=0) throw new OverDueBalanceException("You Have A Due balance, You Can't Borrow Book Until You Pay Up Your Debt");
         if(!book.isAvailable())throw new BookNotFoundException("Book Not Available At The Moment");
         book.setAvailable(false);
+        book.setBorrowerName(user.getUsername());
         bookServices.save(book);
         user.getBorrowBookList().add(book);
-        createBorrowBookTransaction(user,  book);
+        createBorrowBookTransaction( book);
         users.save(user);
         return book;
     }
 
-    private void createBorrowBookTransaction(User user, Book book) {
-        Transaction transaction = new Transaction();
-        transaction.setBorrowedDate(LocalDate.now());
-        transaction.setUser(user);
-        transaction.setBookStatus(BookStatus.BORROWED);
-        transaction.setBook(book);
-        transactionServices.save(transaction);
+    private void createBorrowBookTransaction( Book book) {
+        History history = new History();
+        history.setBorrowedDate(LocalDate.now());
+        history.setBorrowerName(book.getBorrowerName());
+        history.setBookStatus(BookStatus.BORROWED);
+        history.setBook(book);
+        transactionServices.save(history);
     }
 
 
@@ -94,10 +96,13 @@ public class UserServicesImpl implements  UserServices{
     }
 
     @Override
-    public List<Book> viewAvailableBook(String username) {
+    public List<AvailableBookResponse> viewAvailableBook(String username) {
         User user = findByUsername(username.toLowerCase());
         validateLogin(user);
-        return bookServices.getAvailableBooks();
+        List<AvailableBookResponse> availableBookResponses = new ArrayList<>();
+        for(Book book: bookServices.findAll()) availableBookResponses.add(mapAvailableBookResponse(book));
+        if(availableBookResponses.isEmpty())throw new NoTransactionException("No Book Available");
+        return availableBookResponses;
     }
 
     @Override
@@ -110,7 +115,7 @@ public class UserServicesImpl implements  UserServices{
     private Book removeBook(ReturnBookRequest returnBookRequest, User user) {
         Book book = bookServices.findBookByIsbn(returnBookRequest.getIsbn());
         validateBorrowBook(user, book);
-        if(Period.between(LocalDate.now(),book.getMaximumDateToReturnBook()).getDays()>0){
+        if(Period.between(LocalDate.now(),book.getMaximumDateToReturnBook()).getDays()<0){
             user.setBalance(BigDecimal.valueOf(500));
             book.setMaximumDateToReturnBook(LocalDate.now().plusDays(7));
         }else{
@@ -118,19 +123,20 @@ public class UserServicesImpl implements  UserServices{
         }
         user.setBorrowBookList(remove(user.getBorrowBookList(), book));
         users.save(user);
+        book.setBorrowerName(user.getUsername());
         book.setAvailable(true);
         bookServices.save(book);
-        createReturnBookTransaction(user, book);
+        createReturnBookTransaction(book);
         return book;
     }
 
-    private void createReturnBookTransaction(User user, Book book) {
-        Transaction transaction = new Transaction();
-        transaction.setReturnDate(LocalDate.now());
-        transaction.setUser(user);
-        transaction.setBookStatus(BookStatus.RETURNED);
-        transaction.setBook(book);
-        transactionServices.save(transaction);
+    private void createReturnBookTransaction( Book book) {
+        History history = new History();
+        history.setReturnDate(LocalDate.now());
+        history.setBorrowerName(book.getBorrowerName());
+        history.setBookStatus(BookStatus.RETURNED);
+        history.setBook(book);
+        transactionServices.save(history);
     }
 
     private  List<Book> remove(List<Book> books, Book book) {
