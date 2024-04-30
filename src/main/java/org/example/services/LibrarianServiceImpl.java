@@ -2,20 +2,22 @@ package org.example.services;
 
 import org.example.data.model.Librarian;
 import org.example.data.model.Book;
-import org.example.data.model.Transaction;
+import org.example.data.model.History;
 import org.example.data.repository.LibrarianRepository;
 import org.example.dto.request.*;
 import org.example.dto.response.AddBookResponse;
+import org.example.dto.response.AvailableBookResponse;
+import org.example.dto.response.BorrowedBookResponse;
 import org.example.dto.response.RegisterAdminResponse;
 import org.example.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.example.utils.Mapper.map;
+import static org.example.utils.Mapper.*;
 
 @Service
 public class LibrarianServiceImpl implements LibraryServices {
@@ -35,11 +37,11 @@ public class LibrarianServiceImpl implements LibraryServices {
 
 
     @Override
-    public void addTransaction(Transaction transaction, String username) {
-        Book book = transaction.getBook();
+    public void addTransaction(History history, String username) {
+        Book book = history.getBook();
         validateAdmin(username.toLowerCase());
         validateLogin(username.toLowerCase());
-        transactions.save(transaction);
+        transactions.save(history);
     }
 
     private void validateAdmin(String username) {
@@ -104,7 +106,7 @@ public class LibrarianServiceImpl implements LibraryServices {
     }
 
     @Override
-    public List<Transaction> getTransactionHistory(String username) {
+    public List<History> getTransactionHistory(String username) {
         validateAdmin(username.toLowerCase());
         if(transactions.findAll().isEmpty()) throw new NoTransactionException("No Transaction Made Yet");
         return transactions.findAll();
@@ -112,17 +114,37 @@ public class LibrarianServiceImpl implements LibraryServices {
 
 
     @Override
-    public List<Book> getAvailablebooks(String username) {
+    public List<AvailableBookResponse> getAvailablebooks(String username) {
        validateAdmin(username.toLowerCase());
-        return  bookServices.getAvailableBooks();
+       List<AvailableBookResponse> availableBookResponses = new ArrayList<>();
+       for(Book book: bookServices.findAll()){
+           if(book.isAvailable()) availableBookResponses.add(mapAvailableBookResponse(book));
+       }
+       if(availableBookResponses.isEmpty())throw new NoTransactionException("No Book Available");
+       return availableBookResponses;
     }
 
     @Override
-    public List<Book> getBorrowedBook(String username) {
+    public List<BorrowedBookResponse> getBorrowedBook(String username) {
         validateAdmin(username.toLowerCase());
-        return bookServices.getBorrowedBooks();
+        List<BorrowedBookResponse> borrowedBookResponse = new ArrayList<>();
+        for(Book book: bookServices.findAll()) borrowedBookResponse.add(mapBorrowedBookResponse(book));
+        if(borrowedBookResponse.isEmpty())throw new NoTransactionException("No Book Available");
+        return borrowedBookResponse;
+
     }
 
+
+
+    @Override
+    public List<History> getHistoryOfBook(GetBookHistoryRequest getBookHistoryRequest) {
+        validateAdmin(getBookHistoryRequest.getLibrarianName());
+        Book book = bookServices.findBookByIsbn(getBookHistoryRequest.getIsbn());
+        List<History> bookHistory = new ArrayList<>();
+        getTransactionHistory(getBookHistoryRequest.getLibrarianName()).forEach(history ->{ if(history.getBook().getIsbn().equals(book.getIsbn())) bookHistory.add(history);});
+        if(bookHistory.isEmpty())throw new NoBookHistoryFoundException(String.format("No History Of %s Found " ,book.getTitle()));
+        return bookHistory;
+    }
 
 
 }
