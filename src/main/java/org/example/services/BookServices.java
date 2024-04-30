@@ -18,4 +18,6 @@ public interface BookServices {
 
     List<Book> getAvailableBooks();
     List<Book> getBorrowedBooks();
+
+    List<Book> findAll();
 }
