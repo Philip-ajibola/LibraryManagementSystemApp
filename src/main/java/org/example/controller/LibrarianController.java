@@ -41,10 +41,10 @@ public class LibrarianController {
             return new ResponseEntity<>(new ApiResponse(false,e.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/get_transactions/{username}")
-    public ResponseEntity<?> getTransactions(@PathVariable("username") String username){
+    @GetMapping("/get_bookHistory/{username}")
+    public ResponseEntity<?> getBookHistory(@PathVariable("username") String username){
         try{
-            var result = libraryServices.getTransactionHistory(username);
+            var result = libraryServices.getBooksHistory(username);
             return new ResponseEntity<>(new ApiResponse(true,result), HttpStatus.CREATED);
         }catch (LibraryManagementSystemException e){
             return new ResponseEntity<>(new ApiResponse(false,e.getMessage()),HttpStatus.BAD_REQUEST);
