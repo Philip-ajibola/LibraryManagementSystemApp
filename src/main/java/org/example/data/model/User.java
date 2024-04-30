@@ -1,6 +1,7 @@
 package org.example.data.model;
 
 import lombok.Data;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,6 +16,7 @@ public class User {
     private String password;
     private boolean isLoggedIn;
     private BigDecimal balance = BigDecimal.valueOf(0);
+    @Lazy
     private List<Book> borrowBookList = new ArrayList<>();
     @Id
     private String id;
