@@ -64,6 +64,7 @@ public class UserServicesImpl implements  UserServices{
         if(!book.isAvailable())throw new BookNotFoundException("Book Not Available At The Moment");
         book.setAvailable(false);
         book.setBorrowerName(user.getUsername());
+        book.setBorrowDate(LocalDate.now());
         bookServices.save(book);
         user.getBorrowBookList().add(book);
         createBorrowBookTransaction( book);
@@ -73,10 +74,10 @@ public class UserServicesImpl implements  UserServices{
 
     private void createBorrowBookTransaction( Book book) {
         History history = new History();
-        history.setBorrowedDate(LocalDate.now());
+        history.setBorrowedDate(book.getBorrowDate());
         history.setBorrowerName(book.getBorrowerName());
         history.setBookStatus(BookStatus.BORROWED);
-        history.setBook(book);
+        history.setBookId(book.getId());
         transactionServices.save(history);
     }
 
@@ -103,6 +104,20 @@ public class UserServicesImpl implements  UserServices{
         for(Book book: bookServices.findAll()) availableBookResponses.add(mapAvailableBookResponse(book));
         if(availableBookResponses.isEmpty())throw new NoTransactionException("No Book Available");
         return availableBookResponses;
+    }
+
+    @Override
+    public List<Book> findBookByCategory(FindByBookCategoryRequest request) {
+        User user = findByUsername(request.getUsername());
+        validateLogin(user);
+        return bookServices.findBookByCategory(request.getCategory());
+    }
+
+    @Override
+    public List<Book> findBookByAuthor(FindBookByAuthorReQuest request) {
+        User user = findByUsername(request.getUsername());
+        validateLogin(user);
+        return bookServices.findBookByAuthor(request.getBookAuthor());
     }
 
     @Override
@@ -133,9 +148,10 @@ public class UserServicesImpl implements  UserServices{
     private void createReturnBookTransaction( Book book) {
         History history = new History();
         history.setReturnDate(LocalDate.now());
+        history.setBorrowedDate(book.getBorrowDate());
         history.setBorrowerName(book.getBorrowerName());
         history.setBookStatus(BookStatus.RETURNED);
-        history.setBook(book);
+        history.setBookId(book.getId());
         transactionServices.save(history);
     }
 
