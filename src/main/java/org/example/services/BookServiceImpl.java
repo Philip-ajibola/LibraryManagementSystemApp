@@ -64,4 +64,9 @@ public class BookServiceImpl implements BookServices{
         if(borrowedBook.isEmpty())throw new BookNotFoundException("No Book is Borrowed Yet");
         return borrowedBook;
     }
+
+    @Override
+    public List<Book> findAll() {
+        return books.findAll();
+    }
 }
