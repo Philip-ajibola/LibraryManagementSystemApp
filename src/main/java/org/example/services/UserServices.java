@@ -2,6 +2,7 @@ package org.example.services;
 
 import org.example.data.model.Book;
 import org.example.dto.request.*;
+import org.example.dto.response.AvailableBookResponse;
 import org.example.dto.response.BorrowBookResponse;
 import org.example.dto.response.RegisterUserResponse;
 import org.example.dto.response.ReturnBookResponse;
@@ -21,5 +22,5 @@ public interface UserServices {
 
     String logOut(LogOutRequest logOutRequest);
     List<Book> getBorrowedBook(String username);
-    List<Book> viewAvailableBook(String username);
+    List<AvailableBookResponse> viewAvailableBook(String username);
 }
