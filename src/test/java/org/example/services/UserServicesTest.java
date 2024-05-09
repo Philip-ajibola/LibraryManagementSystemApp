@@ -1,5 +1,6 @@
 package org.example.services;
 
+import org.example.data.model.BookCategory;
 import org.example.data.repository.LibrarianRepository;
 import org.example.data.repository.Books;
 import org.example.data.repository.Users;
@@ -144,6 +145,7 @@ public class UserServicesTest {
         bookRequest.setIsbn("1234567584902");
         bookRequest.setTitle("title");
         bookRequest.setAuthor("author");
+        bookRequest.setCategory(BookCategory.HORROR);
         bookRequest.setAdminName(registerAdminRequest.getUsername());
         libraryServices.addBook(bookRequest);
         BorrowBookRequest borrowBookRequest =new BorrowBookRequest();
@@ -163,6 +165,7 @@ public class UserServicesTest {
         AddBookRequest bookRequest = new AddBookRequest();
         bookRequest.setIsbn("1234567584902");
         bookRequest.setTitle("title");
+        bookRequest.setCategory(BookCategory.HORROR);
         bookRequest.setAuthor("author");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
         libraryServices.addBook(bookRequest);
@@ -183,6 +186,7 @@ public class UserServicesTest {
         bookRequest.setIsbn("1234567584902");
         bookRequest.setTitle("title");
         bookRequest.setAuthor("author");
+        bookRequest.setCategory(BookCategory.HORROR);
         bookRequest.setAdminName(registerAdminRequest.getUsername());
         libraryServices.addBook(bookRequest);
         BorrowBookRequest borrowBookRequest =new BorrowBookRequest();
@@ -207,6 +211,7 @@ public class UserServicesTest {
         bookRequest.setIsbn("1234567584902");
         bookRequest.setTitle("title");
         bookRequest.setAuthor("author");
+        bookRequest.setCategory(BookCategory.HORROR);
         bookRequest.setAdminName(registerAdminRequest.getUsername());
         libraryServices.addBook(bookRequest);
         BorrowBookRequest borrowBookRequest =new BorrowBookRequest();
