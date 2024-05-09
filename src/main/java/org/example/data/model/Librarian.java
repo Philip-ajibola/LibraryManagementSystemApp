@@ -14,9 +14,4 @@ public class Librarian {
     private String username;
     private String password;
     private boolean isLoggedIn;
-
-    public Librarian(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
 }
