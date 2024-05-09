@@ -11,6 +11,7 @@ import org.example.dto.response.BorrowBookResponse;
 import org.example.dto.response.RegisterUserResponse;
 import org.example.dto.response.ReturnBookResponse;
 import org.example.exception.*;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -108,16 +109,16 @@ public class UserServicesImpl implements  UserServices{
 
     @Override
     public List<Book> findBookByCategory(FindByBookCategoryRequest request) {
-        User user = findByUsername(request.getUsername());
+        User user = findByUsername(request.getUsername().toLowerCase());
         validateLogin(user);
         return bookServices.findBookByCategory(request.getCategory());
     }
 
     @Override
     public List<Book> findBookByAuthor(FindBookByAuthorReQuest request) {
-        User user = findByUsername(request.getUsername());
+        User user = findByUsername(request.getUsername().toLowerCase());
         validateLogin(user);
-        return bookServices.findBookByAuthor(request.getBookAuthor());
+        return bookServices.findBookByAuthor(request.getBookAuthor().toLowerCase());
     }
 
     @Override
@@ -197,7 +198,8 @@ public class UserServicesImpl implements  UserServices{
     }
 
     private  void validatePassword(String password, User user) {
-        if(!password.equals(user.getPassword()))throw new InvalidPasswordException("Wrong password");
+        StrongPasswordEncryptor passwordEncryptor = new StrongPasswordEncryptor();
+        if(!passwordEncryptor.checkPassword(password,user.getPassword()))throw new InvalidPasswordException("Wrong password");
     }
 
     private void validateLogin(User user){
