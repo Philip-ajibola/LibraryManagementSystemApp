@@ -10,6 +10,7 @@ import org.example.dto.request.RegisterUserRequest;
 import org.example.dto.response.*;
 import org.example.exception.*;
 import org.example.services.TransactionServices;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 
 import java.time.LocalDate;
 
@@ -17,7 +18,7 @@ public class Mapper {
     public static Book map(AddBookRequest bookRequest) {
         validateBookRequest(bookRequest);
         Book book = new Book();
-        book.setAuthorName(bookRequest.getAuthor());
+        book.setAuthorName(bookRequest.getAuthor().toLowerCase());
         book.setTitle(bookRequest.getTitle());
         book.setIsbn(bookRequest.getIsbn());
         book.setBookCategory(bookRequest.getCategory());
@@ -33,7 +34,8 @@ public class Mapper {
     public static Librarian map(RegisterAdminRequest registerAdminRequest) {
         validateRequest(registerAdminRequest);
         Librarian admin = new Librarian();
-        admin.setPassword(registerAdminRequest.getPassword());
+        StrongPasswordEncryptor passwordEncryptor = new StrongPasswordEncryptor();
+        admin.setPassword(passwordEncryptor.encryptPassword(registerAdminRequest.getPassword()));
         admin.setUsername(registerAdminRequest.getUsername().toLowerCase());
         return admin;
     }
@@ -85,7 +87,8 @@ public class Mapper {
     }
     public static User map(RegisterUserRequest registerUserRequest) {
         User user = new User();
-        user.setPassword(registerUserRequest.getPassword());
+        StrongPasswordEncryptor passwordEncryptor =  new StrongPasswordEncryptor();
+        user.setPassword(passwordEncryptor.encryptPassword(registerUserRequest.getPassword()));
         user.setUsername(registerUserRequest.getUsername().toLowerCase());
         return user;
     }
