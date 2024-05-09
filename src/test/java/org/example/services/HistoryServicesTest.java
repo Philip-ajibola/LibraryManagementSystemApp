@@ -26,7 +26,7 @@ public class HistoryServicesTest {
         book.setAuthorName("author");
         History history = new History();
         history.setBookStatus(BookStatus.RETURNED);
-        history.setBook(book);
+        history.setBookId(book.getId());
         history.setBorrowerName(user.getUsername());
         transactions.save(history);
         assertEquals(1,transactions.count());
