@@ -1,13 +1,11 @@
 package org.example.services;
 
-import org.example.data.model.Book;
-import org.example.data.model.BookStatus;
-import org.example.data.model.History;
-import org.example.data.model.User;
+import org.example.data.model.*;
 import org.example.data.repository.LibrarianRepository;
 import org.example.data.repository.Books;
 import org.example.data.repository.Transactions;
 import org.example.dto.request.*;
+import org.example.exception.BookCategoryException;
 import org.example.exception.InvalidPasswordException;
 import org.example.exception.InvalidUserNameException;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,16 +69,12 @@ public class AdminServicesTest {
         assertThrows(InvalidPasswordException.class,()-> libraryServices.registerAdmin(registerAdminRequest));
     }
     @Test
-    public void testThatAdminCanAddTransaction(){
-        History history = new History();
-        libraryServices.addTransaction(history,registerAdminRequest.getUsername());
-        assertEquals(1,transactions.count());
-    }
-    @Test
     public void testThatAdminAccountCanBeReset(){
         ResetAdminRequest resetAdminRequest = new ResetAdminRequest();
         resetAdminRequest.setNewUsername("newUsername");
-        resetAdminRequest.setNewPassword("password");
+        resetAdminRequest.setNewPassword("newPassword");
+        resetAdminRequest.setOldPassword("password");
+        System.out.println(registerAdminRequest.getPassword());
         resetAdminRequest.setOldUsername(registerAdminRequest.getUsername());
         libraryServices.resetAdmin(resetAdminRequest);
         assertEquals(1, librarianRepository.count());
@@ -92,6 +86,7 @@ public class AdminServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setIsbn("1234568794");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
+        bookRequest.setCategory(BookCategory.CHILDREN_BOOK);
         libraryServices.addBook(bookRequest);
         assertEquals(1,books.count());
     }
@@ -102,6 +97,7 @@ public class AdminServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setIsbn("1234568794");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
+        bookRequest.setCategory(BookCategory.CHILDREN_BOOK);
         libraryServices.addBook(bookRequest);
         DeleteBookRequest deleteBookRequest = new DeleteBookRequest();
         deleteBookRequest.setIsbn(bookRequest.getIsbn());
@@ -115,7 +111,7 @@ public class AdminServicesTest {
         History history = new History();
         Book book = new Book();
         history.setBookStatus(BookStatus.BORROWED);
-        history.setBook(book);
+        history.setBookId(book.getId());
         history.setBorrowerName(user.getUsername());
         transactions.save(history);
         assertEquals(1, libraryServices.getBooksHistory(registerAdminRequest.getUsername()).size());
@@ -126,6 +122,7 @@ public class AdminServicesTest {
         resetAdminRequest.setNewPassword("newPassword");
         resetAdminRequest.setNewUsername("newAdmin");
         resetAdminRequest.setOldUsername(registerAdminRequest.getUsername());
+        resetAdminRequest.setOldPassword("password");
         libraryServices.resetAdmin(resetAdminRequest);
         assertEquals(1, librarianRepository.count());
     }
@@ -136,6 +133,7 @@ public class AdminServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setIsbn("1234568794");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
+        bookRequest.setCategory(BookCategory.CHILDREN_BOOK);
         libraryServices.addBook(bookRequest);
        assertEquals(1, libraryServices.getAvailablebooks(registerAdminRequest.getUsername()).size());
 
@@ -147,6 +145,7 @@ public class AdminServicesTest {
         bookRequest.setTitle("title");
         bookRequest.setIsbn("1234568794");
         bookRequest.setAdminName(registerAdminRequest.getUsername());
+        bookRequest.setCategory(BookCategory.CHILDREN_BOOK);
         libraryServices.addBook(bookRequest);
         Book book = books.findByIsbn("1234568794");
         book.setAvailable(false);
@@ -154,6 +153,16 @@ public class AdminServicesTest {
         assertEquals(1, libraryServices.getBorrowedBook(registerAdminRequest.getUsername()).size());
         assertEquals(1,books.count());
     }
+    @Test
+    public void testThatWhenBookCategoryIsNotAddedExceptionIsThrown(){
+        AddBookRequest bookRequest = new AddBookRequest();
+        bookRequest.setAuthor("author");
+        bookRequest.setTitle("title");
+        bookRequest.setIsbn("1234568794");
+        bookRequest.setAdminName(registerAdminRequest.getUsername());
+        assertThrows(BookCategoryException.class,()->libraryServices.addBook(bookRequest));
+    }
+
 
 
 
