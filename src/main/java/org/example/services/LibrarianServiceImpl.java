@@ -10,6 +10,7 @@ import org.example.dto.response.AvailableBookResponse;
 import org.example.dto.response.BorrowedBookResponse;
 import org.example.dto.response.RegisterAdminResponse;
 import org.example.exception.*;
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +55,8 @@ public class LibrarianServiceImpl implements LibraryServices {
     public RegisterAdminResponse resetAdmin(ResetAdminRequest resetAdminRequest) {
         Librarian admin = librarianRepository.findByUsername(resetAdminRequest.getOldUsername().toLowerCase());
         if(admin == null) throw new LibraryManagementSystemException("Admin Not Found");
-        if(!resetAdminRequest.getOldPassword().equals(admin.getPassword()))throw new InvalidPasswordException("InValid Password");
+        StrongPasswordEncryptor passwordEncryptor = new StrongPasswordEncryptor();
+        if(!passwordEncryptor.checkPassword(resetAdminRequest.getOldPassword(),admin.getPassword()))throw new InvalidPasswordException("InValid Password");
         admin.setUsername(resetAdminRequest.getNewUsername().toLowerCase());
         admin.setPassword(resetAdminRequest.getNewPassword());
         librarianRepository.save(admin);
@@ -82,7 +84,8 @@ public class LibrarianServiceImpl implements LibraryServices {
     public String login(LogInRequest logInRequest) {
         validateAdmin(logInRequest.getUsername().toLowerCase());
         Librarian admin = librarianRepository.findByUsername(logInRequest.getUsername().toLowerCase());
-        if(!logInRequest.getPassword().equals(admin.getPassword()))throw new InvalidPasswordException("Wrong password");
+        StrongPasswordEncryptor passwordEncryptor = new StrongPasswordEncryptor();
+        if(passwordEncryptor.encryptPassword(logInRequest.getPassword()).equals(admin.getPassword()))throw new InvalidPasswordException("Wrong password");
         admin.setLoggedIn(true);
         librarianRepository.save(admin);
         return "Login successful";
