@@ -1,5 +1,6 @@
 package org.example.services;
 
+import org.example.data.model.BookCategory;
 import org.example.data.repository.LibrarianRepository;
 import org.example.data.repository.Books;
 import org.example.dto.request.AddBookRequest;
@@ -30,11 +31,13 @@ public class BookServicesTest {
          bookRequest = new AddBookRequest();
         bookRequest.setAuthor("author");
         bookRequest.setIsbn("1234567868");
+        bookRequest.setCategory(BookCategory.CHILDREN_BOOK);
         bookRequest.setTitle("title");
     }
 
     @Test
     public void testThatBookCanBeAdded() {
+
         bookServices.addbook(bookRequest);
         assertEquals(1,books.count());
     }
