@@ -54,6 +54,15 @@ public class Mapper {
         available.setTitle(book.getTitle());
         return available;
     }
+
+    public static BorrowBookResponseForUser mapUserBorrowedBook(Book book) {
+        BorrowBookResponseForUser borrowedBook = new BorrowBookResponseForUser();
+        borrowedBook.setBookId(book.getId());
+        borrowedBook.setBookTitle(book.getTitle());
+        borrowedBook.setBookAuthor(book.getAuthorName());
+        borrowedBook.setCategory(book.getBookCategory());
+        return borrowedBook;
+    }
     public static BorrowedBookResponse mapBorrowedBookResponse(Book book) {
         BorrowedBookResponse available = new BorrowedBookResponse();
 
@@ -74,14 +83,11 @@ public class Mapper {
         response.setMaximumDateToReturnBook(book.getMaximumDateToReturnBook());
         return response;
     }
-    public static ReturnBookResponse mapp(User user, Book book) {
+    public static ReturnBookResponse mapp( Book book) {
         ReturnBookResponse response = new ReturnBookResponse();
         response.setBookTitle(book.getTitle());
         response.setBookIsbn(book.getIsbn());
-        response.setBorrowerId(user.getId());
-        response.setBorrowerName(user.getUsername());
         response.setBookId(book.getId());
-        response.setAvailable(book.isAvailable());
         response.setReturnedDate(LocalDate.now());
         return response;
     }
