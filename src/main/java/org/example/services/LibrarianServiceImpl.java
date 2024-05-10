@@ -91,7 +91,7 @@ public class LibrarianServiceImpl implements LibraryServices {
         return "Login successful";
     }
     private static void validateRequest(RegisterAdminRequest registerAdminRequest) {
-        if(!registerAdminRequest.getUsername().matches("[a-zA-Z0-9]+"))throw new InvalidUserNameException("Username Can Only Contain Alphabet And Number and not null");
+        if(!registerAdminRequest.getUsername().matches("^[a-zA-Z]+[0-9]*$"))throw new InvalidUserNameException("Username Can Only Contain Alphabet And Number and not null");
         if(registerAdminRequest.getPassword().trim().isEmpty())throw new InvalidPasswordException("Provide A Valid Password");
     }
 
@@ -132,8 +132,10 @@ public class LibrarianServiceImpl implements LibraryServices {
     public List<BorrowedBookResponse> getBorrowedBook(String username) {
         validateAdmin(username.toLowerCase());
         List<BorrowedBookResponse> borrowedBookResponse = new ArrayList<>();
-        for(Book book: bookServices.findAll()) borrowedBookResponse.add(mapBorrowedBookResponse(book));
-        if(borrowedBookResponse.isEmpty())throw new NoTransactionException("No Book Available");
+        for(Book book: bookServices.findAll()) {
+            if(!book.isAvailable()) borrowedBookResponse.add(mapBorrowedBookResponse(book));
+        }
+        if(borrowedBookResponse.isEmpty())throw new NoTransactionException("No Book Borrowed Yet");
         return borrowedBookResponse;
 
     }
