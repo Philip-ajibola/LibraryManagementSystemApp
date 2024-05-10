@@ -71,9 +71,23 @@ public class BookServiceImpl implements BookServices{
 
     @Override
     public List<Book> findBookByAuthor(String author) {
-        List<Book > bookList = books.findBookByAuthorName(author);
-        if(bookList.isEmpty())throw new BookNotFoundException("No Books Found For " + author);
-        return bookList;
+        List<Book > bookList = books.findBookByAuthorName(checkAuthor(author));
+            if(bookList.isEmpty())throw new BookNotFoundException("No Books Found For " + author);
+            return bookList;
+
+    }
+
+    private String checkAuthor(String author) {
+        for(Book book: books.findAll()) {
+            if(normalizeAuthor(book.getAuthorName()).equalsIgnoreCase(normalizeAuthor(author))){
+                return book.getAuthorName();
+            }
+        };
+        return "";
+    }
+
+    private String normalizeAuthor(String author) {
+        return author.replaceAll(" ","");
     }
 
     @Override
