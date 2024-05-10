@@ -6,10 +6,7 @@ import org.example.data.model.History;
 import org.example.data.model.User;
 import org.example.data.repository.Users;
 import org.example.dto.request.*;
-import org.example.dto.response.AvailableBookResponse;
-import org.example.dto.response.BorrowBookResponse;
-import org.example.dto.response.RegisterUserResponse;
-import org.example.dto.response.ReturnBookResponse;
+import org.example.dto.response.*;
 import org.example.exception.*;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,12 +81,15 @@ public class UserServicesImpl implements  UserServices{
 
 
     @Override
-    public List<Book> getBorrowedBook(String username){
+    public List<BorrowBookResponseForUser> getBorrowedBook(String username){
         User user = findByUsername(username.toLowerCase());
         validateLogin(user);
         if(user.getBorrowBookList().isEmpty())throw new BookNotFoundException("No Book Borrowed Yet");
-        return user.getBorrowBookList();
+        List<BorrowBookResponseForUser> books = new ArrayList<>();
+        user.getBorrowBookList().forEach(book -> {books.add(mapUserBorrowedBook(book));});
+        return books;
     }
+
 
     private User findByUsername(String username) {
         User user = users.findByUsername(username);
@@ -108,24 +108,38 @@ public class UserServicesImpl implements  UserServices{
     }
 
     @Override
-    public List<Book> findBookByCategory(FindByBookCategoryRequest request) {
+    public List<AddBookResponse> findBookByCategory(FindByBookCategoryRequest request) {
         User user = findByUsername(request.getUsername().toLowerCase());
         validateLogin(user);
-        return bookServices.findBookByCategory(request.getCategory());
+        List<AddBookResponse> books= new ArrayList<>();
+        bookServices.findBookByCategory(request.getCategory()).forEach(book -> { books.add(mapBookResponse(book));});
+        if(books.isEmpty())throw new NoTransactionException("No Book Of  "+ request.getCategory()+" Category Found");
+        return books;
     }
 
     @Override
-    public List<Book> findBookByAuthor(FindBookByAuthorReQuest request) {
+    public List<AddBookResponse> findBookByAuthor(FindBookByAuthorReQuest request) {
         User user = findByUsername(request.getUsername().toLowerCase());
         validateLogin(user);
-        return bookServices.findBookByAuthor(request.getBookAuthor().toLowerCase());
+        List<AddBookResponse> books= new ArrayList<>();
+        bookServices.findBookByAuthor(request.getBookAuthor().toLowerCase()).forEach(book -> { books.add(mapBookResponse(book));});
+        if(books.isEmpty())throw new NoTransactionException("No Book by  "+ request.getBookAuthor()+"Found");
+        return books;
+    }
+
+    private AddBookResponse mapBookResponse(Book book) {
+        AddBookResponse addBookResponse = new AddBookResponse();
+        addBookResponse.setBookId(book.getId());
+        addBookResponse.setBookTitle(book.getTitle());
+        addBookResponse.setBookISBN(book.getIsbn());
+        return addBookResponse;
     }
 
     @Override
     public ReturnBookResponse returnBook(ReturnBookRequest returnBookRequest) {
         User user = findByUsername(returnBookRequest.getUsername().toLowerCase());
         validateLogin(user);
-        return mapp(user,removeBook(returnBookRequest, user));
+        return mapp(removeBook(returnBookRequest, user));
     }
 
     private Book removeBook(ReturnBookRequest returnBookRequest, User user) {
@@ -206,7 +220,7 @@ public class UserServicesImpl implements  UserServices{
         if(!user.isLoggedIn())throw new LoginException("Please Login ");
     }
     private static void validateRequest(RegisterUserRequest registerUserRequest) {
-        if(!registerUserRequest.getUsername().matches("[a-zA-Z0-9]+"))throw new InvalidUserNameException("Username Can Only Contain Alphabet And Number and not null");
+        if(!registerUserRequest.getUsername().matches("^[a-zA-Z]+[0-9]*$"))throw new InvalidUserNameException("Username Can Only Contain Alphabet And Number and not null");
         if(registerUserRequest.getPassword().trim().isEmpty())throw new InvalidPasswordException("Provide A Valid Password");
     }
 }
