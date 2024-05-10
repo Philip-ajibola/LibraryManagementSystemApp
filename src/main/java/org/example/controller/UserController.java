@@ -61,7 +61,7 @@ public class UserController {
         }
     }
     @GetMapping("/find_book_by_author")
-    public ResponseEntity<?> findBookByAuthor(FindBookByAuthorReQuest reQuest){
+    public ResponseEntity<?> findBookByAuthor(@RequestBody  FindBookByAuthorReQuest reQuest){
         try{
             var result = userServices.findBookByAuthor(reQuest);
             return new ResponseEntity<>(new ApiResponse(true,result), HttpStatus.CREATED);
@@ -69,7 +69,7 @@ public class UserController {
             return new ResponseEntity<>(new ApiResponse(false,e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }@GetMapping("/find_book_by_category")
-    public ResponseEntity<?> findBookByCategory(FindByBookCategoryRequest request){
+    public ResponseEntity<?> findBookByCategory(@RequestBody  FindByBookCategoryRequest request){
         try{
             var result = userServices.findBookByCategory(request);
             return new ResponseEntity<>(new ApiResponse(true,result), HttpStatus.CREATED);
