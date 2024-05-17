@@ -8,6 +8,7 @@ import org.example.data.repository.Users;
 import org.example.dto.request.*;
 import org.example.dto.response.*;
 import org.example.exception.*;
+import org.example.utils.Mapper;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,11 +33,15 @@ public class UserServicesImpl implements  UserServices{
     @Override
     public RegisterUserResponse registerUser(RegisterUserRequest registerUserRequest) {
         validateRequest(registerUserRequest);
+        validateUserExistence(registerUserRequest);
         User user =users.save(map(registerUserRequest));
-        users.save(user);
         return map(user);
     }
 
+    private void validateUserExistence(RegisterUserRequest registerUserRequest) {
+        if(users.existsByUsername(registerUserRequest.getUsername()))throw new UserAlreadyExistException("Username Already Exist");
+        if(users.existsByEmail(registerUserRequest.getEmail()))throw new UserAlreadyExistException("Email Already Exist");
+    }
 
 
     @Override
@@ -222,5 +227,6 @@ public class UserServicesImpl implements  UserServices{
     private static void validateRequest(RegisterUserRequest registerUserRequest) {
         if(!registerUserRequest.getUsername().matches("^[a-zA-Z]+[0-9]*$"))throw new InvalidUserNameException("Username Can Only Contain Alphabet And Number and not null");
         if(registerUserRequest.getPassword().trim().isEmpty())throw new InvalidPasswordException("Provide A Valid Password");
+        if(!registerUserRequest.getEmail().matches("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$")) throw new InvalidEmailException("Invalid Email");
     }
 }
