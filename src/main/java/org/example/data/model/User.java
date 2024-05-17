@@ -15,6 +15,7 @@ public class User {
     private String username;
     private String password;
     private boolean isLoggedIn;
+    private String email;
     private BigDecimal balance = BigDecimal.valueOf(0);
     @Lazy
     private List<Book> borrowBookList = new ArrayList<>();
