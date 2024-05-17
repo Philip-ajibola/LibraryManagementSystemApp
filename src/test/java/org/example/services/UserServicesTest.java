@@ -37,6 +37,7 @@ public class UserServicesTest {
         registerAdminRequest.setUsername("username");
         registerAdminRequest.setPassword("password");
 
+
         libraryServices.registerAdmin(registerAdminRequest);
 
         LogInRequest logInRequest = new LogInRequest();
@@ -48,7 +49,7 @@ public class UserServicesTest {
         registerUserRequest = new RegisterUserRequest();
         registerUserRequest.setPassword("password");
         registerUserRequest.setUsername("username");
-
+        registerUserRequest.setEmail("teresejosephyisa@gmail.com");
 
         books.deleteAll();;
         users.deleteAll();
