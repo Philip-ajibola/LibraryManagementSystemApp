@@ -24,6 +24,7 @@ public class UserController {
             return new ResponseEntity<>(new ApiResponse(false,e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
+
     @PostMapping("/login")
     private ResponseEntity<?> login(@RequestBody LogInRequest logInRequest){
         try{
