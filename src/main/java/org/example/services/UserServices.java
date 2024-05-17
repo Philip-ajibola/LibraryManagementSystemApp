@@ -15,7 +15,6 @@ public interface UserServices {
     ReturnBookResponse returnBook(ReturnBookRequest returnBookRequest);
 
     String login(LogInRequest logInRequest);
-
     String logOut(LogOutRequest logOutRequest);
     List<BorrowBookResponseForUser> getBorrowedBook(String username);
     List<AvailableBookResponse> viewAvailableBook(String username);
