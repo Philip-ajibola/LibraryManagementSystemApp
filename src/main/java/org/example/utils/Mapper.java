@@ -13,8 +13,14 @@ import org.example.services.TransactionServices;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Mapper {
+    private static String otp;
+    private static RegisterUserRequest request = new RegisterUserRequest();
+    private static LocalDateTime OTPtimeRange = LocalDateTime.now();
+
+
     public static Book map(AddBookRequest bookRequest) {
         validateBookRequest(bookRequest);
         Book book = new Book();
@@ -92,12 +98,46 @@ public class Mapper {
         return response;
     }
     public static User map(RegisterUserRequest registerUserRequest) {
+        request = registerUserRequest;
         User user = new User();
         StrongPasswordEncryptor passwordEncryptor =  new StrongPasswordEncryptor();
         user.setPassword(passwordEncryptor.encryptPassword(registerUserRequest.getPassword()));
         user.setUsername(registerUserRequest.getUsername().toLowerCase());
+        user.setEmail(registerUserRequest.getEmail());
+        EmailSender emailSender = new EmailSender();
+        emailSender.setSubject("Welcome to Magnificent Online Book Store! YOUR OTP");
+        emailSender.setReceiverMail(registerUserRequest.getEmail());
+        emailSender.setMessage(sendMessage(registerUserRequest.getUsername(), user.getEmail()));
+        emailSender.send();
         return user;
     }
+
+    private static String sendMessage(String username,String email) {
+        return String.format("""
+                                
+                Dear %s,
+                                
+                Congratulations! YouWelcome to Magnificent Online Book Store! have successfully registered on Magnificent Online Book Store!.
+               We are excited to have you as a part of our community.
+                                
+                Your account details are as follows:            
+                Username: %s
+                Email: %s
+                
+                YOUR OTP : 123456
+                
+                You can now log in to your account and start using our services. If you have any
+               questions or concerns, please don't hesitate to contact us at "ajibolaphilip10@gmail.com".
+                                
+                Thank you for choosing Magnificent Online Book Store!. We look forward to serving you.
+                                
+                Best regards,
+                                
+                                                                         Magnificent Online Book Store!
+                                          
+                """,username,username,email);
+    }
+
     public static RegisterUserResponse map(User user){
         RegisterUserResponse response = new RegisterUserResponse();
         response.setId(user.getId());
